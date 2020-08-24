@@ -1,0 +1,92 @@
+<%- include("header.ejs")%>
+
+  <!-- Navigation -->
+
+
+  <!-- Page Content -->
+  <div class="container">
+
+
+      <!-- Blog Entries Column -->
+
+        <h1 class="my-4">Page Heading
+          <small>Secondary Text</small>
+        </h1>
+
+        <ol class="breadcrumb ">
+          <li class="breadcrumb-item">
+            <a href="/">Home</a>
+          </li>
+          <li class="breadcrumb-item active">posts</li>
+        </ol>
+
+
+        <div id="posts">
+          <% posts.forEach((post) => { %>
+            <div class="card mb-4">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-lg-6">
+                    <% if(post.image){%>
+                    <img class="img-fluid" src="<%=post.image%>" alt="Card image cap">
+                    <%} else {%>
+                    <img class="img-fluid" src="http://placehold.it/750x300" alt="Card image cap">
+                      <%}%>
+                  </div>
+                  <div class="col-lg-6">
+                    <h2 class="card-title"><%= post.title%></h2>
+                    <p class="card-text"><%= post.content %></p>
+                    <a href="/post/<%=post.id%>" class="btn btn-primary">Read More &rarr;</a>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+
+          <%})%>
+        </div>
+
+
+
+
+      <!-- Sidebar Widgets Column -->
+
+    </div>
+    <!-- /.row -->
+
+  </div>
+
+  <script type="text/javascript">
+    var socket = io();
+     socket.on("new_post",function(post){
+          var html="";
+          html+='<div class="card mb-4">'
+            html+='<div class="card-body">'
+              html+='<div class="row">'
+                html+='<div class="col-lg-6">'
+
+                  html+='<img class="img-fluid" src="'+post.image+'" alt="Card image cap">'
+
+
+
+                html+='</div>'
+                html+='<div class="col-lg-6">'
+                  html+='<h2 class="card-title">'+ post.title+'</h2>'
+                  html+='<p class="card-text">'+post.content+'</p>'
+                  html+='<a href="/post/'+post.id+'" class="btn btn-primary">Read More &rarr;</a>'
+                html+='</div>'
+
+              html+='</div>'
+            html+='</div>'
+
+          html+='</div>'
+          $("#posts").prepend(html);
+
+     });
+  </script>
+  <!-- /.container -->
+
+  <!-- Footer -->
+<%- include("footer.ejs") %>

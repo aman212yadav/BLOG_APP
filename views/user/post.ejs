@@ -1,0 +1,123 @@
+<%-include("header.ejs")%>
+
+  <!-- Navigation -->
+
+
+  <!-- Page Content -->
+  <div class="container">
+
+    <!-- Page Heading/Breadcrumbs -->
+    <h1 class="mt-4 mb-3"><%=post.title%>
+      <small>by
+        <a href="#">Start Bootstrap</a>
+      </small>
+    </h1>
+
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="/">Home</a>
+      </li>
+      <li class="breadcrumb-item active"><%=post.title%></li>
+    </ol>
+
+    <div class="row">
+
+      <!-- Post Content Column -->
+      <div class="col-lg-12">
+
+        <!-- Preview Image -->
+        <img class="img-fluid rounded" src="<%=post.image%>" alt="">
+
+        <hr>
+
+        <!-- Date/Time -->
+        <p>Posted on January 1, 2017 at 12:00 PM</p>
+
+        <hr>
+
+        <!-- Post Content -->
+         <p>
+           <%=post.content%>
+         </p>
+        <hr>
+
+        <!-- Comments Form -->
+        <div class="card my-4">
+          <h5 class="card-header">Leave a Comment:</h5>
+          <div class="card-body">
+            <form method="post" action="/do-comment" id="commentForm">
+              <input type="hidden" id="post_id" name="post_id" value="<%=post.id%>" >
+              <div class="form-group">
+                <input type="text" name="username" value="" placeholder="username" class="form-control">
+              </div>
+              <div class="form-group">
+                <textarea class="form-control" name="comment" rows="3"></textarea>
+              </div>
+              <input type="submit" id="submitBtn" class="btn btn-primary" value="submit">
+            </form>
+          </div>
+        </div>
+
+        <!-- Single Comment -->
+        <div id="comments">
+          <% if(post.comments){ %>
+          <% post.comments.forEach(function(comment){%>
+            <div class="media mb-4">
+              <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+              <div class="media-body">
+                <h5 class="mt-0"><%=comment.username%></h5>
+                <%=comment.comment%>
+              </div>
+            </div>
+
+          <%})}%>
+        </div>
+
+
+
+
+      </div>
+
+
+
+    </div>
+
+  </div>
+  <script type="text/javascript">
+     var socket=io();
+     $("#commentForm").submit(function(event){
+
+ event.preventDefault(); //prevent default action
+ var post_url = $(this).attr("action"); //get form action url
+  //get form GET/POST method
+  var data = {};
+    var dataArray = $(this).serializeArray();
+    for(var i=0;i<dataArray.length;i++){
+      data[dataArray[i].name] = dataArray[i].value;
+    } //Encode form elements for submission
+  console.log(data.username);
+ $.post( post_url, data, function( response ) {
+           alert(response.text);
+             data.id=response.id;
+              socket.emit("new_comment",data);
+});
+return false;
+   });
+
+socket.on("new_comment",function(comment){
+    if(comment.post_id!=$("#post_id").val())
+      return;
+     var html="";
+      html+='<div class="media mb-4">'
+         html+='<img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">'
+         html+='<div class="media-body">'
+         html+='  <h5 class="mt-0">'+comment.username+'</h5>'
+         html+=comment.comment
+         html+='</div>'
+     html+='</div>'
+      $("#comments").prepend(html);
+    });
+
+  </script>
+
+<%-include("footer.ejs") %>
